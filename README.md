@@ -10,3 +10,5 @@ Monitoramento: https://console.cloud.google.com/monitoring/dashboards?authuser=1
 
 
 Endereço aplicação no ar: http://34.66.76.1:8081
+
+Detalhes de implementações contidos no WIKI deste repositório.
