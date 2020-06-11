@@ -1,39 +1,22 @@
 /**/
-var session_login = sessionStorage.getItem("sess_email_cadi");
-
-
-if(session_login == null){
-        window.location.href = 'index.html';
-}else{
-
   $(document).ready(function () {
       
+      let timeline = new Timeline('/dono');let projects;
 
-      let timeline = new Timeline('/dono');
-      let projects;
+
       let maisInfoModal = $('#modal-mais-info');
 
-/* Informações do Usuário CADI */
-      $.post("/usuarioLogado", JSON.stringify({'email': session_login}), function(user){
-        userData(user);
-      }, "json");
- 
+      Fetch.get(`/cadi/byID`).then(cadi => {
+        Fetch.get(`/projeto/bycadi/${cadi.email}`).then(projetos => {
+          insertProjectsOnTable(projetos);
+        });
+      
     
-/* </> Informações do Usuário CADI */
-
-
-       /* <> Rotas de inicialização dos objetos */
-      $.get('/dono', session_login)
-          .done(function(projetos){
-          projects = JSON.parse(projetos);
-          insertProjectsOnTable(projects);
+      Fetch.get(`/projeto/byNotExistsCadi`).then(projetos => {
+        insertSemDono(projetos);
+    
       });
-
-      $.get('/semdono')
-          .done(function(projetos){
-          projects = JSON.parse(projetos);
-          insertSemDono(projects);
-      });
+    
       
        /* </> Rotas de inicialização dos objetos */
 
@@ -52,9 +35,6 @@ if(session_login == null){
                 </td>
               </tr>
             `);
-
-          
-      
             let $tr = $(tr);
             let a = $tr.find('[data-maisinfo]');
             a.click(function(e) {
@@ -68,15 +48,15 @@ if(session_login == null){
               let elements = [
                 {
                   element: pegaElemento('info-descricao-breve'),
-                  key: 'descricao-breve'
+                  key: 'descricaoBreve'
                 },          
                 {
                   element: pegaElemento('info-descricao-completa'),
-                  key: 'descricao-completa'
+                  key: 'descricaoCompleta'
                 },
                 {
                   element: pegaElemento('info-descricao-tecnologias'),
-                  key: 'descricao-tecnologias'
+                  key: 'descricaoTecnologica'
                 },
                 {
                   element: pegaElemento('info-links-externos'),
@@ -85,19 +65,19 @@ if(session_login == null){
                 },
                 {
                   element: pegaElemento('info-link-externo-1'),
-                  key: 'link-externo-1'
+                  key: 'linkExterno1'
                 },
                 {
                   element: pegaElemento('info-link-externo-2'),
-                  key: 'link-externo-2'
+                  key: 'linkExterno2'
                 },
                 {
                   element: pegaElemento('info-empresario'),
-                  key: 'responsavel-empresario'
+                  key: 'responsavelEmpresario'
                 },
                 {
                   element: pegaElemento('info-professores-responsaveis'),
-                  key: 'responsavel-professor',
+                  key: 'responsavelProfessor',
                   excessao: true
                 },
                 {
@@ -123,7 +103,7 @@ if(session_login == null){
 
                 item.element.removeClass('d-none');
       
-                if (item.key.indexOf('link-externo') != -1) {
+                if (item.key.indexOf('linkExterno') != -1) {
                   contentElement.attr('href', project[item.key]);
                 }
       
@@ -137,7 +117,7 @@ if(session_login == null){
                   }
                 }
                 else if (!item.key) {
-                  if (!project['link-externo-1'] && !project['link-externo-2']) {
+                  if (!project['linkExterno1'] && !project['linkExterno2']) {
                     item.element.addClass('d-none');
                     return;
                   }
@@ -162,25 +142,37 @@ if(session_login == null){
                     contentElement.text(`${reuniao.data} - ${reuniao.horario} - ${reuniao.local}`);
                   }
                 }
-                else if (item.key === 'entregas' || item.key ==='responsavel-professor') {
-                  $('li').remove();
+                else if (item.key === 'entregas' || item.key ==='responsavelProfessor') {
+                  $('#info-entregas li').remove();
                   if (!project[item.key].length) {
                     item.element.addClass('d-none');
                     return;
                   }
                   else {
-                    project[item.key].forEach(x => {
-                      console.log(x);
-                      contentElement.append($.parseHTML(`<li>${x['aluno-responsavel']}</li>`));
-                      x['alunos'].forEach(x => {
-                      contentElement.append($.parseHTML(`<li>${x}</li>`));
-                      });
+                      project[item.key].forEach(x => {
+                        console.log(x);
+                        contentElement.append($.parseHTML(`<li class="divider list-group-item-info">Aluno Responsável: </li>
+                        <li>${x['alunoResponsavel']}</li>
+                        <li class="divider list-group-item-info">Alunos</li>`));
+
+                        x['alunos'].forEach(x => {
+                            contentElement.append($.parseHTML(`<li>${x}</li>`));
+                        });
+
+                        contentElement.append($.parseHTML(`
+                        <li class="divider list-group-item-info"></li>
+                        <li>Link Respositório: <a href="${x['linkRepositorio']}">${x['linkRepositorio']}</a></li>
+                            <li>Link Cloud: <a href="${x['linkCloud']}">${x['linkCloud']}</a></li>
+                            <li>Comentário: ${x['comentario']}</li>
+                        `));
                     });
                   }
                 }
               });
+              $('#modal-mais-info ul').addClass('list-group');
+              $('#modal-mais-info li').addClass('list-group-item');
             });
-      
+         
             timeline.insertTimeline($tr.find('[data-timeline-show]').get(0), project);
       
             tbody.append(tr);
@@ -193,21 +185,20 @@ if(session_login == null){
         let tbody_semdono = $('[data-semdono-table-body]');
     
         projecs.forEach(project => {
-          email = project['responsavel-empresario'];
+          email = project['responsavelEmpresario'];
           var empresa;
           var contato;
           var $tr2
-          $.get('/searchEmpresario/'+email)
+          
+          $.get('/empresario/byEmail/'+email)
           .done( data => {
-            //, function(data){
-              console.log(data)
-              empresa = JSON.parse(data).empresa;
-              telefone = JSON.parse(data).telefone;
+              empresa = data.empresa;
+              telefone = data.telefone;
               console.log(empresa)
-              var tr2 = $.parseHTML(`<tr data-project-item="${ project._id.$oid }> 
+              var tr2 = $.parseHTML(`<tr data-project-item="${ project._id}> 
               <th scope="row">${ project.titulo }</th>
                   <td>${ project.titulo }</td>
-                  <td>${ project['descricao-breve'] }</td>
+                  <td>${ project['descricaoBreve'] }</td>
                   <td>${ empresa }</td>
               </tr>`);
               $tr2 = $(tr2);
@@ -222,8 +213,8 @@ if(session_login == null){
   
                 let body_sd =  $.parseHTML(`
                 <div><h5>Titulo</h5><p>${ project.titulo }</p></div>
-                <div><h5>Descricao: </h5><p>${ project['descricao-breve'] }</p></div>
-                <div><h5>Empresário: </h5><p>${ project['responsavel-empresario']}</p></div>
+                <div><h5>Descricao: </h5><p>${ project['descricaoBreve'] }</p></div>
+                <div><h5>Empresário: </h5><p>${ project['responsavelEmpresario']}</p></div>
                 <div><h5>Empresa: </h5><p>${ empresa }</p></div>
                 <div><h5>Contato: </h5><p>${ telefone }</p></div>
                 `);
@@ -247,8 +238,10 @@ if(session_login == null){
   
                 /* evento que submita a atribuição para o CADI */
                 $submit.click(function(){
-                    $.post("/semdono", JSON.stringify({'_id':project._id, 'responsavel-cadi': sessionStorage.getItem("sess_email_cadi")}), "json");
-                    location.reload();
+                  project.responsavelCadi = cadi.email;
+                  Fetch.post("/projeto/update", project).then(() => {
+                    console.log(project)
+                  });
                 });
   
                 modbody.append(body_sd);
@@ -258,14 +251,14 @@ if(session_login == null){
           .fail( e => console.log(e))
           
           })
-          
-          
-          
+
       }
+
+    });
 
       function userData(user){
           /* <> Logou do Usuário */
-          let navCADI = $('[data-user]');
+          let navCADI = $('[data-user-nav]');
           let logout = $.parseHTML(`
           <li><i class="fa fa-sign-out" aria-hidden="true"></i> 
           <button type="button" class="btn btn-danger">Logout</button></li>`);
@@ -320,7 +313,7 @@ if(session_login == null){
       
   });
 
-}
+
 function fechaPopupSemDono(event) {
   event.preventDefault();
   document.getElementById('modal_semdono').style.display='none';    
@@ -412,8 +405,6 @@ function _isAdmin(users){
 
     ul_tabs.append(nav);
     div_content.append(content);
-
-    let tbody_data_users = $('[data-user-admintab]');
     
     users.forEach(user => {
       let tr = $.parseHTML(`<tr data-user-item="${ user._id }> 
@@ -426,7 +417,7 @@ function _isAdmin(users){
         </tr>
     `);
 
-       tbody_data_users.append(tr);
+    $('[data-user-admintab]').append(tr);
 
       /* Alterar Senha */
       let updateSenha = $.parseHTML(`

@@ -1,5 +1,6 @@
 var Timeline = function (endpoint) {
 
+  
   if (!endpoint) {
     throw new Error('É preciso de um endpoint de salvamento de projeto para instanciar Timeline');
   }
@@ -9,7 +10,7 @@ var Timeline = function (endpoint) {
 
   function _getInitialModalHTML(projeto) {
     return `
-      <div class="modal fade" id="modal-extra-${ projeto._id.$oid}" tabindex="-1" role="dialog" aria-labelledby="modal-label" aria-hidden="true">
+      <div class="modal fade" id="modal-extra-${ projeto._id}" tabindex="-1" role="dialog" aria-labelledby="modal-label" aria-hidden="true" data-focus-on="input:first">
         <div class="modal-dialog ${ projeto.fase == 5 ? 'modal-xl' : ''}" role="document">
           <div class="modal-content">
             <div class="modal-header">
@@ -26,82 +27,71 @@ var Timeline = function (endpoint) {
           </div>
         </div>
       </div>
+      <div class="modal fade" id="modalRecusa" tabindex="-1" role="dialog" aria-labelledby="modal-label" aria-hidden="true" data-focus-on="input:first">
+              <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="tituloRecusa">Recusar Projeto</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Fechar">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <form data-form-project-change>
+                  <div class="modal-body">
+                 	<label for="formGroupRecusa">Insira o motivo da recusa:</label>
+        			<input type="text"  class="form-control" name="recusa" id="recusa">
+                  </div>
+                  <div class="modal-footer">
+                    <button type="submit" class="btn btn-danger"  data-dismiss="modal" recusar>Recusar</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                  </div>
+                  </form>
+                </div>
+              </div>
+            </div>
     `;
   }
 
   function _customPopupElement(projeto, inputsHTML) {
 
-    let modalExtra = `#modal-extra-${projeto._id.$oid} `;
+    let modalExtra = `#modal-extra-${projeto._id} `;
 
     $('#modal-label').text(projeto.titulo);
 
     $(modalExtra + '.modal-body').html(inputsHTML);
+    
+    $(document).on('show.bs.modal', '.modal', function () {
+        var zIndex = 1040 + (10 * $('.modal:visible').length);
+        $(this).css('z-index', zIndex);
+        setTimeout(function() {
+            $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
+        }, 0);
+    });
 
     if ([1, 3, 4].indexOf(projeto.fase) != -1) {
       $(modalExtra + '.modal-footer').append(`
       <div class="btn-group btn-group-toggle" data-toggle="buttons">
           <button type="button" class="btn btn-primary" aceitar-avaInit>Aceitar</button>
-          <button type="button" class="btn btn-danger" recusar-avaInit>Recusar</button>
+          <button type="button"  class="btn btn-danger" data-toggle="modal" href="#modalRecusa">Recusar</a>
       </div>
       `);
 
       $('[aceitar-avaInit]').click(function (e) {
-        if (projeto.fase === 1) {
-          $.post("/pulafase", JSON.stringify({'_id':projeto._id, 'fase':2}), "json");
-          location.reload();
-        }
-        if(projeto.fase === 3){
-          $.post("/pulafase", JSON.stringify({'_id':projeto._id, 'fase':4}), "json");
-          location.reload();
-        }
-        if(projeto.fase === 4){
-          var dataEntrega= $('#formGroupInserirEntrega').val();
-          alert(dataEntrega);
-
-          alert(datas);
-          $.post("/pulafase", JSON.stringify({'_id':projeto._id, 'datasReuniao':datas, 'dataEntrega':dataEntrega, 'responsavel-professor': $('#professor').val()}), "json");
-          location.reload();
-        }
-        if (projeto.fase == 5){
-          $.post("/pulafase", JSON.stringify({'_id':projeto._id, 'reuniao' : {'data':dataReuniao}}), "json");
-        }
+          projeto.fase = projeto.fase+1;
+          Fetch.post("/projeto/update", projeto).then(() => {
+              console.log(projeto);
+          });
       });
       
-      $('[recusar-avaInit]').click(function (e) {
-          /*if (projeto.fase === 1) {
-            $.post("/pulafase", JSON.stringify({'_id':projeto._id, 'fase':2}), "json");
-            location.reload();
-          }
-          if(projeto.fase === 3){
-            $.post("/pulafase", JSON.stringify({'_id':projeto._id, 'fase':4}), "json");
-            location.reload();
-          }*/
-          if(projeto.fase === 4){
-        	  projeto.status.negado = true;
-        	  //$(document.body).prepend(_getModalRecusado(projeto));
-        	  //_getModalRecusado();
-          }
-          /*if (projeto.fase == 5){
-            $.post("/pulafase", JSON.stringify({'_id':projeto._id, 'reuniao' : {'data':dataReuniao}}), "json");
-          }*/
-        });
+      $('[recusar]').click(function (e) {
+          var rec = document.getElementById('recusa');
+          projeto.status.negado = true;
+          projeto.status.motivo = rec.value;
+          Fetch.post("/projeto/update", projeto).then(() => {
+            console.log(projeto);
+          });
+      });
       
-      function _getModalRecusado() {
-        	return
-        		`<div>
-        			<h3>Ação de Recusa</h3>
-        		 </div>
-        		 <form data-form-project-change>
-        		 <div class="form-group">
-        		 	<label for="formGroupRecusa">Insira o motivo da recusa:</label>
-        			<input type="text"  class="form-control" name="recusa" id="infoRecusa">
-        		 </div>
-        		 <div>
-        		 	<button type="submit" class="btn btn-danger" data-dismiss="modal">Recusar</button>
-        		 </div>
-        		 </form>
-        	`;
-        }
     }
   }
 
@@ -127,23 +117,6 @@ var Timeline = function (endpoint) {
         return '';
     }
     
-    function _getModalRecusado() {
-      	return
-      		`<div>
-      			<h3>Ação de Recusa</h3>
-      		 </div>
-      		 <form data-form-project-change>
-      		 <div class="form-group">
-      		 	<label for="formGroupRecusa">Insira o motivo da recusa:</label>
-      			<input type="text"  class="form-control" name="recusa" id="infoRecusa">
-      		 </div>
-      		 <div>
-      		 	<button type="submit" class="btn btn-danger" data-dismiss="modal">Recusar</button>
-      		 </div>
-      		 </form>
-      	`;
-      }
-    
 
     function _getAvalInicHTML() {
       return `
@@ -153,7 +126,7 @@ var Timeline = function (endpoint) {
       </div>
       <div>
          <h3>Descrição Breve</h3>
-         <p data-descricao-breve>${projeto['descricao-breve']}</p>
+         <p data-descricao-breve>${projeto['descricaoBreve']}</p>
       </div>
       
    `;
@@ -164,15 +137,15 @@ var Timeline = function (endpoint) {
         <form data-form-project-change>
           <div class="form-group">
             <label for="desc-completa">Descrição Completa:</label>
-            <textarea data-descricao-completa class="form-control" id="desc-completa" rows="3">${projeto['descricao-completa']}</textarea>
+            <textarea data-descricao-completa class="form-control" id="desc-completa" rows="3">${projeto['descricaoCompleta']}</textarea>
           </div>
           <div class="form-group">
-            <label for="desc-tecnologias">Descrição das Tecnologias:</label>
-            <textarea data-descricao-tecnologias class="form-control" id="desc-tecnologias" rows="3">${projeto['descricao-tecnologias']}</textarea>
+            <label for="desc-tecnologias">Descrição das Tecnologicas:</label>
+            <textarea data-descricao-tecnologias class="form-control" id="desc-tecnologias" rows="3">${projeto['descricaoTecnologica']}</textarea>
           </div>
           <div class="form-group">
             <label for="link-externo-2">Link externo 2:</label>
-            <input data-link-externo-2 type="text" class="form-control" value="${projeto['link-externo-2']}" id="link-externo-2">
+            <input data-link-externo-2 type="text" class="form-control" value="${projeto['linkExterno2']}" id="link-externo-2">
           </div>
         </form>`;
     }
@@ -185,23 +158,23 @@ var Timeline = function (endpoint) {
         </div>
         <div>
             <h3>Descrição Breve</h3>
-            <p data-descricao-breve>${projeto['descricao-breve']}</p>
+            <p data-descricao-breve>${projeto['descricaoBreve']}</p>
         </div>
         <div>
             <h3>Descrição Completa</h3>
-            <p data-descricao-completa>${projeto['descricao-completa']}</p>
+            <p data-descricao-completa>${projeto['descricaoCompleta']}</p>
         </div>
         <div>
             <h3>Descrição Tecnologias</h3>
-            <p data-descricao-tecnologias>${projeto['descricao-tecnologias']}</p>
+            <p data-descricao-tecnologias>${projeto['descricaoTecnologica']}</p>
         </div>
         <div>
             <h3>Link Externo 1</h3>
-            <a data-link-externo href="${projeto['link-externo-1']}">${projeto['link-externo-1']}</a>
+            <a data-link-externo href="${projeto['linkExterno1']}">${projeto['linkExterno1']}</a>
         </div>
         <div>
             <h3>Link Externo 2</h3>
-            <a data-link-externo-2 href="${projeto['link-externo-2']}">${projeto['link-externo-2']}</a>
+            <a data-link-externo-2 href="${projeto['linkExterno2']}">${projeto['linkExterno2']}</a>
         </div>
         
 
@@ -299,14 +272,14 @@ var Timeline = function (endpoint) {
            	var profs = [];
            	  $(document).ready(function () {
            	  		
-                $.getJSON("/listarProf", function(data){
+                $.getJSON("/professor/all", function(data){
                   
                   $.each(data, function(i){
                       
-                    profs.push("<option value="+this.email+">" + "Nome: " + this.name + " | Email: " + this.email + "</option> ");
+                    profs.push("<option value="+this.email+">" + "Nome: " + this.nome + " | Email: " + this.email + "</option> ");
                   });	
 
-                $('#professor').append(profs);
+                  $('#professor').append(profs);
 				        });
 				      });
 			      </script>
@@ -342,9 +315,9 @@ var Timeline = function (endpoint) {
           `
                   <tr>
                     <th scope="row">${ index + 1}</th>
-                    <td>${ entrega['aluno-responsavel']}</td>
-                    <td><a href="${ entrega['link-repositorio']}" target="_blank">${entrega['link-repositorio']}</a></td>
-                    <td><a href="${ entrega['link-cloud']}" target="_blank">${entrega['link-cloud']}</a></td>
+                    <td>${ entrega['alunoResponsavel']}</td>
+                    <td><a href="${ entrega['linkRepositorio']}" target="_blank">${entrega['linkRepositorio']}</a></td>
+                    <td><a href="${ entrega['linkCloud']}" target="_blank">${entrega['linkCloud']}</a></td>
                     <td>${ entrega.comentario}</td>
                   </tr>
                 `
@@ -399,7 +372,7 @@ var Timeline = function (endpoint) {
         title: 'Cadastro Detalhado',
         isActive: projeto.fase > 2,
         isPending: projeto.fase == 2,
-        isWaitingForInput: false //projeto.fase == 2 && (!projeto['descricao-completa'] || !projeto['descricao-tecnologias'])
+        isWaitingForInput: false //projeto.fase == 2 && (!projeto['descricao-completa'] || !projeto['descricaoTecnologica'])
       },
       {
         icon: _getIcon(''),
@@ -412,15 +385,15 @@ var Timeline = function (endpoint) {
         icon: _getIcon(''),
         title: 'Reunião',
         isActive: projeto.fase > 4,
-        isPending: projeto.fase == 4 && !projeto.reuniao['datas-possiveis'].length,
+        isPending: projeto.fase == 4 && !projeto.reuniao['datasPossiveis'].length,
         isWaitingForInput: projeto.fase == 4 //projeto.fase == 4 && projeto.reuniao['datas-possiveis'].length
-      },
+      }, 
       {
         icon: _getIcon(''),
         title: 'Entrega',
-        isActive: projeto.fase > 5,
+        isActive: projeto.fase >= 5,
         isPending: projeto.fase == 5 && !projeto.entregas.length,
-        isWaitingForInput: projeto.fase == 5
+        isWaitingForInput: false
       }
     ];
 
@@ -435,7 +408,7 @@ var Timeline = function (endpoint) {
           extraAttributes = `
               href="#" 
               data-toggle="modal" 
-              data-target="#modal-extra-${ projeto._id.$oid}"
+              data-target="#modal-extra-${ projeto._id}"
               data-open-to-input`;
         }
         return `

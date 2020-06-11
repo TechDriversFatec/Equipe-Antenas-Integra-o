@@ -17,7 +17,9 @@
 .navbar a {
     margin: 0 8px;
 }
-
+nav{
+  background: #eee;
+}
 .head {
     height: 65px;
     background-color: #92D0FD;
