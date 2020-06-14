@@ -15,7 +15,7 @@
 * ![Monitoramento](https://console.cloud.google.com/monitoring/dashboards?authuser=1&project=canvas-verve-240811)
 * ![Endereço aplicação no ar](http://34.66.76.1:8080)
 
-## Tabela das tecnologias implementadas e em adequação até a última sprint
+## Tecnologias Aplicadas
 
 ![Tabela de Tecnologias](https://github.com/Marcoskisto/antenas-integracao/blob/master/InfraEstrutura/Tabela%20de%20Tecnologias.png)
 
