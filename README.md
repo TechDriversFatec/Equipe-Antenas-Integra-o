@@ -12,7 +12,7 @@ Endereço aplicação no ar:
 
 ## Tabela das tecnologias implementadas e em adequação até a última sprint
 
-![Tabela de Tecnologias](/InfraEstrutura/tabela_de_tecnologias.png)
+![Tabela de Tecnologias](https://github.com/Marcoskisto/antenas-integracao/blob/master/InfraEstrutura/Tabela%20de%20Tecnologias.png)
 
 ## Detalhes sobre as Tecnologias aplicadas
 
