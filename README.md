@@ -61,9 +61,17 @@ Assim, para que as primeiras coisas funcionem, siga os seguintes passos:
 1. Acessar a pasta /etc/antenas
    > cd /etc/antenas
 1. Inicializar o cluster swarm
-   > docker swarm init
-   > docker stack deploy -c docker-compose.yml infra-antenas
-  
+   > docker build -t server_tomcat:1.0 .
+   > docker swarm init  
+   > docker stack deploy -c docker-compose.yml infra
+   >> Para derrubar a stack -> docker stack rm infra
+1. comandos úteis
+   1. Listar os nodes após o docker swarm init
+      > docker nodes ls
+   1. Derrubar a stack a que foi dado deploy no swarm
+      > docker stack rm <nome_da_stack>
+   1. Listar os serviços que foram levantados na stack
+      > docker service ls
 ### 3. Containers
 A inicialização e controle dos containers é realizado através do docker-compose. Para isso foi criado um arquivo docker-compose.yml. O conteúdo do docker-compose.yml:
 **[docker-compose](https://github.com/Marcoskisto/antenas-integracao/blob/master/InfraEstrutura/docker-compose.yml)**
