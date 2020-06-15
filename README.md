@@ -30,9 +30,14 @@ A aplicação está sendo hospedada em um servidor atravez do Google Cloud.
 ##### 1. Criar uma instância de VM do Debian 9 no GoogleCloud;
 Ao colocar a instância em execução, o acesso à VM é feito por SSH pela própria página do googleCloud onde é aberto um terminal. É através desse terminal que serão feitos os passos a seguir para configuração do ambiente e deploy do projeto.
 ##### 2. Instalar os pacotes no Debian 9:
-* Instalar GIT - **sudo apt-get install git**
+* Instalar GIT
 * Instalar o Docker;
 * Instalar o docker-compose;
+   > sudo apt update
+   > sudo apt upgrade
+   > sudo curl -sSL https://get.docker.com/ | sh
+   > sudo apt-get install git docker-compose unzip
+   
 
 ##### 3. Habilitar o Acesso por HTTP:
 * Abrir o GoogleCloud Console;
@@ -40,8 +45,25 @@ Ao colocar a instância em execução, o acesso à VM é feito por SSH pela pró
 * Clicar no nome da Instância da VM criada;
 * Na parte superior, clicar em **Editar**;
 * Rolar a página para baixo e em **Firewalls**, marcar a opção **Permitir Tráfego HTTP**;
-* Na política de controle do Firewall, liberar as portas 8080 a 8089, 5000, 9000, 9090,  9100, 9990, 19990, 19999.
+* Na política de controle do Firewall, liberar as portas 3000,8080 a 8089, 5000, 9000, 9090,  9100, 9990, 19990, 19999.
 
+### 3. Infraestrutura
+Para funcionamento do projeto é necessário instalar na VM do google cloud todas as ferramentas necessárias. Toda essa parafernalha está disponível na pasta InfraEstrutura deste projeto.
+Assim, para que as primeiras coisas funcionem, siga os seguintes passos:
+1. Inicie a Instância de VM CRIADA NO Item *2* deste tutorial e acesse o terminal SSH;
+1. Baixar o projeto do github
+   > git clone https://github.com/leonardormlins/antenas-integracao.git
+1. Descompactar
+   > unzip antenas-integracao.zip
+1. Copiar os arquivos de configuração da infraestrutura para a pasta /etc/antenas
+   > mkdir /etc/antenas  
+   > cp -r ./antenas-integracao/InfraEstrutura/* /etc/antenas
+1. Acessar a pasta /etc/antenas
+   > cd /etc/antenas
+1. Inicializar o cluster swarm
+   > docker swarm init
+   > docker stack deploy -c docker-compose.yml infra-antenas
+  
 ### 3. Containers
 A inicialização e controle dos containers é realizado através do docker-compose. Para isso foi criado um arquivo docker-compose.yml. O conteúdo do docker-compose.yml:
 **[docker-compose](https://github.com/Marcoskisto/antenas-integracao/blob/master/InfraEstrutura/docker-compose.yml)**
