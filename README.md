@@ -30,9 +30,10 @@ A aplicação está sendo hospedada em um servidor atravez do Google Cloud.
 ##### 1. Criar uma instância de VM do Debian 9 no GoogleCloud;
 Ao colocar a instância em execução, o acesso à VM é feito por SSH pela própria página do googleCloud onde é aberto um terminal. É através desse terminal que serão feitos os passos a seguir para configuração do ambiente e deploy do projeto.
 ##### 2. Instalar os pacotes no Debian 9:
-* Instalar GIT - **sudo apt-get install git**
+* Instalar GIT
 * Instalar o Docker;
 * Instalar o docker-compose;
+> **sudo apt-get install git docker docker-compose unzip**
 
 ##### 3. Habilitar o Acesso por HTTP:
 * Abrir o GoogleCloud Console;
