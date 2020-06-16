@@ -83,14 +83,9 @@ Assim, para que as primeiras coisas funcionem, siga os seguintes passos:
    1. Listar os serviços que foram levantados na stack  
       > docker service ls  
 ### 3. Containers
-A inicialização e controle dos containers é realizado através do docker-compose. Para isso foi criado um arquivo docker-compose.yml. O conteúdo do docker-compose.yml:
-**[docker-compose](https://github.com/Marcoskisto/antenas-integracao/blob/master/InfraEstrutura/docker-compose.yml)**
-* Clonar o Projeto:
-    * git clone http://https://github.com/Marcoskisto/antenas-integracao.git
-* Inicializar o swarm:
-    * docker swarm init
-    * cd antenas-integracao/InfraEstrutura/
-    * docker stack deploy -c docker-compose.yml antenas-stack (antes desse comando deve-se acessar a pasta de Dockerfiles e criar as imagens docker)   
+A inicialização e controle dos containers/serviços é realizado através do comando ** docker stack deploy bla-bla-bla**(não digita isso) visto no item anterior. Para que isso fosse possível, foi criado um arquivo docker-compose.yml. O conteúdo do **[docker-compose.yml](https://github.com/Marcoskisto/antenas-integracao/blob/master/InfraEstrutura/docker-compose.yml)**
+Esse arquivo contém os parâmetros necessários para criação dos contaíners como imagem de origem, portas de serviço e etc.   
+Quando é feito o deploy desse arquivo o docker levanta uma stack de serviços através de seus containsers descritos abaixo:
 
 Com esse docker-compose foram criados os seguintes containers:
 #### 1. Container webServer_antenas
