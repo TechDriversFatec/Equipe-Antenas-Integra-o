@@ -33,25 +33,58 @@ Ao colocar a instância em execução, o acesso à VM é feito por SSH pela pró
 * Instalar GIT
 * Instalar o Docker;
 * Instalar o docker-compose;
-> **sudo apt-get install git docker docker-compose unzip**
-
+   > sudo apt update  
+   > sudo apt upgrade  
+   > sudo curl -sSL https://get.docker.com/ | sh  
+   > sudo apt-get install git docker-compose unzip  
 ##### 3. Habilitar o Acesso por HTTP:
 * Abrir o GoogleCloud Console;
 * Em recursos, clicar em **Compute Engine**;
 * Clicar no nome da Instância da VM criada;
 * Na parte superior, clicar em **Editar**;
 * Rolar a página para baixo e em **Firewalls**, marcar a opção **Permitir Tráfego HTTP**;
-* Na política de controle do Firewall, liberar as portas 8080 a 8089, 5000, 9000, 9090,  9100, 9990, 19990, 19999.
+* Na política de controle do Firewall, liberar as portas 3000,8080 a 8095, 5000, 9000, 9090,  9100, 9990, 19990, 19999.
 
+##### 4. Configurar um **IP fixo externo** para nossa máquina virtual 
+1. Acessar o google cloud console;
+1. Interromper a execução da máquina virtual
+1. Clicar em rede VPC;
+1. Clicar em Endereços IP externos;
+1. Clicar em reservar endereços estáticos; 
+1. Preencher os campos solicitados e confirmar.
+
+### 3. Infraestrutura
+Para funcionamento do projeto é necessário instalar na VM do google cloud todas as ferramentas necessárias. Toda essa parafernalha está disponível na pasta InfraEstrutura deste projeto.
+Assim, para que as primeiras coisas funcionem, siga os seguintes passos:
+1. Inicie a Instância de VM CRIADA NO Item *2* deste tutorial e acesse o terminal SSH;
+1. Baixar o projeto do github  
+   > git clone https://github.com/leonardormlins/antenas-integracao.git  
+1. Descompactar  
+   > unzip antenas-integracao.zip  
+1. Copiar os arquivos de configuração da infraestrutura para a pasta /etc/antenas  
+   > mkdir /etc/antenas  
+   > cp -r ./antenas-integracao/InfraEstrutura/* /etc/antenas  
+1. Criar volume docker para o jenkins  
+   > mkdir /var/dockerVolumes/jenkins  
+   > mkdir /var/dockerVolumes/portainer  
+   > chown -R 1000:1000 /var/dockerVolumes  
+1. Acessar a pasta /etc/antenas  
+   > cd /etc/antenas  
+1. Inicializar o cluster swarm  
+   > docker build -t server_tomcat:1.0 .  
+   > docker swarm init  
+   > docker stack deploy -c docker-compose.yml infra  
+1. comandos úteis  
+   1. Listar os nodes após o docker swarm init  
+      > docker nodes ls  
+   1. Derrubar a stack a que foi dado deploy no swarm  
+      > docker stack rm <nome_da_stack>  
+   1. Listar os serviços que foram levantados na stack  
+      > docker service ls  
 ### 3. Containers
-A inicialização e controle dos containers é realizado através do docker-compose. Para isso foi criado um arquivo docker-compose.yml. O conteúdo do docker-compose.yml:
-**[docker-compose](https://github.com/Marcoskisto/antenas-integracao/blob/master/InfraEstrutura/docker-compose.yml)**
-* Clonar o Projeto:
-    * git clone http://https://github.com/Marcoskisto/antenas-integracao.git
-* Inicializar o swarm:
-    * docker swarm init
-    * cd antenas-integracao/InfraEstrutura/
-    * docker stack deploy -c docker-compose.yml antenas-stack (antes desse comando deve-se acessar a pasta de Dockerfiles e criar as imagens docker)   
+A inicialização e controle dos containers/serviços é realizado através do comando ** docker stack deploy bla-bla-bla**(não digita isso) visto no item anterior. Para que isso fosse possível, foi criado um arquivo docker-compose.yml. O conteúdo do **[docker-compose.yml](https://github.com/Marcoskisto/antenas-integracao/blob/master/InfraEstrutura/docker-compose.yml)**
+Esse arquivo contém os parâmetros necessários para criação dos contaíners como imagem de origem, portas de serviço e etc.   
+Quando é feito o deploy desse arquivo o docker levanta uma stack de serviços através de seus containsers descritos abaixo:
 
 Com esse docker-compose foram criados os seguintes containers:
 #### 1. Container webServer_antenas
