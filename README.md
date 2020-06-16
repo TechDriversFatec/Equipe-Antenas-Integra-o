@@ -33,12 +33,11 @@ Ao colocar a instância em execução, o acesso à VM é feito por SSH pela pró
 * Instalar GIT
 * Instalar o Docker;
 * Instalar o docker-compose;
-   > sudo apt update
-   > sudo apt upgrade
-   > sudo curl -sSL https://get.docker.com/ | sh
-   > sudo apt-get install git docker-compose unzip
+   > sudo apt update  
+   > sudo apt upgrade  
+   > sudo curl -sSL https://get.docker.com/ | sh  
+   > sudo apt-get install git docker-compose unzip  
    
-
 ##### 3. Habilitar o Acesso por HTTP:
 * Abrir o GoogleCloud Console;
 * Em recursos, clicar em **Compute Engine**;
