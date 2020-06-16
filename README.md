@@ -45,33 +45,44 @@ Ao colocar a instância em execução, o acesso à VM é feito por SSH pela pró
 * Clicar no nome da Instância da VM criada;
 * Na parte superior, clicar em **Editar**;
 * Rolar a página para baixo e em **Firewalls**, marcar a opção **Permitir Tráfego HTTP**;
-* Na política de controle do Firewall, liberar as portas 3000,8080 a 8089, 5000, 9000, 9090,  9100, 9990, 19990, 19999.
+* Na política de controle do Firewall, liberar as portas 3000,8080 a 8095, 5000, 9000, 9090,  9100, 9990, 19990, 19999.
+
+##### 4. Configurar um **IP fixo externo** para nossa máquina virtual 
+1. Acessar o google cloud console;
+1. Interromper a execução da máquina virtual
+1. Clicar em rede VPC;
+1. Clicar em Endereços IP externos;
+1. Clicar em reservar endereços estáticos; 
+1. Preencher os campos solicitados e confirmar.
 
 ### 3. Infraestrutura
 Para funcionamento do projeto é necessário instalar na VM do google cloud todas as ferramentas necessárias. Toda essa parafernalha está disponível na pasta InfraEstrutura deste projeto.
 Assim, para que as primeiras coisas funcionem, siga os seguintes passos:
 1. Inicie a Instância de VM CRIADA NO Item *2* deste tutorial e acesse o terminal SSH;
-1. Baixar o projeto do github
-   > git clone https://github.com/leonardormlins/antenas-integracao.git
-1. Descompactar
-   > unzip antenas-integracao.zip
-1. Copiar os arquivos de configuração da infraestrutura para a pasta /etc/antenas
+1. Baixar o projeto do github  
+   > git clone https://github.com/leonardormlins/antenas-integracao.git  
+1. Descompactar  
+   > unzip antenas-integracao.zip  
+1. Copiar os arquivos de configuração da infraestrutura para a pasta /etc/antenas  
    > mkdir /etc/antenas  
-   > cp -r ./antenas-integracao/InfraEstrutura/* /etc/antenas
-1. Acessar a pasta /etc/antenas
-   > cd /etc/antenas
-1. Inicializar o cluster swarm
-   > docker build -t server_tomcat:1.0 .
+   > cp -r ./antenas-integracao/InfraEstrutura/* /etc/antenas  
+1. Criar volume docker para o jenkins  
+   > mkdir /var/dockerVolumes/jenkins  
+   > mkdir /var/dockerVolumes/portainer  
+   > chown -R 1000:1000 /var/dockerVolumes  
+1. Acessar a pasta /etc/antenas  
+   > cd /etc/antenas  
+1. Inicializar o cluster swarm  
+   > docker build -t server_tomcat:1.0 .  
    > docker swarm init  
-   > docker stack deploy -c docker-compose.yml infra
-   >> Para derrubar a stack -> docker stack rm infra
-1. comandos úteis
-   1. Listar os nodes após o docker swarm init
-      > docker nodes ls
-   1. Derrubar a stack a que foi dado deploy no swarm
-      > docker stack rm <nome_da_stack>
-   1. Listar os serviços que foram levantados na stack
-      > docker service ls
+   > docker stack deploy -c docker-compose.yml infra  
+1. comandos úteis  
+   1. Listar os nodes após o docker swarm init  
+      > docker nodes ls  
+   1. Derrubar a stack a que foi dado deploy no swarm  
+      > docker stack rm <nome_da_stack>  
+   1. Listar os serviços que foram levantados na stack  
+      > docker service ls  
 ### 3. Containers
 A inicialização e controle dos containers é realizado através do docker-compose. Para isso foi criado um arquivo docker-compose.yml. O conteúdo do docker-compose.yml:
 **[docker-compose](https://github.com/Marcoskisto/antenas-integracao/blob/master/InfraEstrutura/docker-compose.yml)**
