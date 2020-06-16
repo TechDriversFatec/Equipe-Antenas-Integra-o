@@ -22,10 +22,10 @@
 ## Detalhes sobre as Tecnologias aplicadas
 
 ### 1. Source Control Mgmt
-Para o versionamento e controle do código fonte, está sendo utilizadas as tecnologias GIT e GITHUB:
+Para o versionamento e controle do código fonte, estão sendo utilizadas as tecnologias GIT e GITHUB:
 
 ### 2. Cloud
-A aplicação está sendo hospedada em um servidor atravez do Google Cloud.
+A aplicação está sendo hospedada em um servidor através do Google Cloud.
 #### Instalação e configuração da máquina virtual no Google Cloud
 ##### 1. Criar uma instância de VM do Debian 9 no GoogleCloud;
 Ao colocar a instância em execução, o acesso à VM é feito por SSH pela própria página do googleCloud onde é aberto um terminal. É através desse terminal que serão feitos os passos a seguir para configuração do ambiente e deploy do projeto.
