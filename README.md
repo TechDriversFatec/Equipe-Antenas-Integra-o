@@ -156,6 +156,10 @@ O SonarQube possibilitará análise em virtude do pipeline de testes do projeto.
 ## 10. Release Orchestration
 ## 11. Security
 ## 12. Configuration
+O Ansible é uma ferramenta de automação de código aberto usada para configurar servidores, instalar software e executar uma grande variedade de tarefas de TI a partir de uma localização central e sua única dependência é ter Python2 instalado.
+Utilizamos o Ansible para o ambiente da VM instanciada no Google Cloud caso futuramente sejam necessárias outas VM's.
+Como o Ansible utiliza SSH para se comunicar com os clientes não necessitando de agent, foram geradas chaves pública e privada que foram inclusas no Google Cloud.
+Logo após foi feita a conecção com a instância/vm usando a chave privada e realizada a instalação do Ansible.
 ## 13. AIOps
 
 
