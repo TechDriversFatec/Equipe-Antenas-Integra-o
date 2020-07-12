@@ -165,7 +165,7 @@ Como o Ansible utiliza SSH para se comunicar com os clientes não necessitando d
 Logo após foi feita a conecção com a instância/vm usando a chave privada e realizada a instalação do Ansible.
 ## 13. AIOps
 
-Instalado em nossa suíte de serviços e que também pode ser considerado uma aplicação de grande potencial para o assunto de AIOps, é o Prometheus. É possível através de um modelo previamente treinado e configurado ao Prometheus, detectar anomalias e condições de previsão de falhas. Apesar de o objetivo deste trabalho não ser desenvolver e treinar um modelo capaz de analisar estes dados para esta finalidade, a aplicação Prometheus permite que esta área seja explorada. Um case de sucesso usando Prometheus em detecção de anomalias (aqui)[https://www.youtube.com/watch?v=27SmkF8YbZs] .
+Instalado em nossa suíte de serviços e que também pode ser considerado uma aplicação de grande potencial para o assunto de AIOps, é o Prometheus. É possível através de um modelo previamente treinado e configurado ao Prometheus, detectar anomalias e condições de previsão de falhas. Apesar de o objetivo deste trabalho não ser desenvolver e treinar um modelo capaz de analisar estes dados para esta finalidade, a aplicação Prometheus permite que esta área seja explorada. Um case de sucesso usando Prometheus em detecção de anomalias [aqui](https://www.youtube.com/watch?v=27SmkF8YbZs) .
 
 <br><br><br><br><br><br><br><br><br><br><br>
 ###### Revisão:
