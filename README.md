@@ -194,3 +194,4 @@ Caso necessite instalar o netdata diretamente no host pode-se realizar os seguin
 
 Criar usuário prometheus:
 useradd --nocreate-home --shell /bin/false prometheus
+# Equipe-Antenas-Integra-o
